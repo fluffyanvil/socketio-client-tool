@@ -10,6 +10,7 @@ var localdb = null;
 
 $(function() {
   $('#jsonData').hide();
+  $("#rawJsonData").hide();
   $('.emitted-msg').hide();
   $('.emitted-failure-msg').hide();
   $('.listen-failure-msg').hide();
@@ -20,10 +21,17 @@ $(function() {
     if (this.value === 'JSON') {
       $('#plainTextData').hide();
       $('#jsonData').show();
+      $("#rawJsonData").hide();
     }
     if (this.value === 'plaintext') {
       $('#plainTextData').show();
       $('#jsonData').hide();
+      $("#rawJsonData").hide();
+    }
+    if (this.value === 'RawJSON') {
+      $('#plainTextData').hide();
+      $('#jsonData').hide();
+      $("#rawJsonData").show();
     }
   });
 
@@ -92,15 +100,25 @@ $(function() {
     }
   });
 
+  function JSONize(str) {
+    var obj = eval('(' + str + ')')
+    return obj
+  }
+
   $("#emitData").submit(function(e) {
     if (socket.io) {
-      var event = $("#emitData #event-name").val().trim();
+      var event = $("#emitData #event-name").val().trim();      
       var data;
       if ($('#emitAsJSON').is(":checked")) {
         data = parseJSONForm();
       }
       if ($('#emitAsPlaintext').is(":checked")) {
         data = $("#emitData #data-text").val().trim();
+      }
+      if ($('#emitAsRawJSON').is(":checked")) {
+        data = JSONize($("#emitData #data-json").val().trim())
+        console.log('data:',data);
+        
       }
       if (event !== '' && data !== '') {
         var emitData = {
